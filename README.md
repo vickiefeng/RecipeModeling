@@ -29,4 +29,10 @@ To determine the best hyperparameters to use, GridSearchCV was used to conduct a
 This model returned the following results: a training R^2 score of 0.9325672188801855, testing R^2 score of 0.25185712795581877, training RMSE of 0.10837943984116992, and testing RMSE of 0.3456270812465938. There is a slight increase in model performance, as the results on the test set show. Overall, the improved R^2 scores and reduced RMSE values in the final model suggest that the additional feature engineering, transformations, and hyperparameter tuning have resulted in a more effective model. The model is better at capturing the variability in the data and generalizing to unseen examples, as evidenced by the higher test R^2 score and the lower test RMSE compared to the baseline model.
 
 ## Fairness Analysis
+To test the fairness of my model, I created two groups: one for recipes under 60 minutes and one for recipes over 60 minutes, storing them as 0s and 1s in the original dataframe under the `time_group` column. The question here is: Does my model worse for recipes over 60 minutes than it does for recipes under 60 minutes? 
 
+**Null Hypothesis**: Our model is fair. Its RMSE for recipes under 60 minutes is roughly the same as its RMSE for recipes over 60 minutes, and any difference is due to random chance. 
+
+**Alternative Hypothesis**: Our model is unfair. Its RMSE for recipes under 60 minutes is lower than its RMSE for recipes over 60 minutes.
+
+I ran a permutation test with 1000 iterations, each time shuffling the `time_group` column, using the model to predict for each group, calculating the difference in RMSE of group X and group Y as a test statistic, and appending that to an array of test statistics. I used a significance level of 0.05 and obtained a p-value of 0.006. This means we reject the null hypothesis and onclude that there is evidence to suggest that the model's ability to predict average ratings for recipes with shorter cooking times is significantly different (in this case, better) than its ability to predict average ratings for recipes with longer cooking times.
